@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+   
+    <!-- model.name form view -->
+    <record id="cancel_appointment_view_form" model="ir.ui.view">
+        <field name="name">cancel.appointment.view.form</field>
+        <field name="model">cancel.appointment</field>
+        <field name="arch" type="xml">
+            <form string="">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="appointment_id" invisible="context.get('hide_appointment')"  domain="[('state', '=', 'draft')]"/>
+                            <field name="reason"/>
+                        </group>
+                        <group>
+                          <field name="date_cancel"/>
+                        </group>
+                        
+                    </group>
+                    <footer>
+                        <button string="Cancel janji temu" name="action_cancel" type="object" class="btn-primary"/>
+                        <button special= "cancel" data-hotkey="z" string="Discard"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!-- model.name action window -->
+    <record id="cancel_appointment_action" model="ir.actions.act_window">
+        <field name="name">Pembatalan Janji temu</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">cancel.appointment</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+       
+          
+     
+    </record>
+    <!-- This Menu Item must have a parent and an action -->
+    <menuitem id="patient_tag_menu_act" name="Tags" parent="menu_configuration" action="patient_tag_action" sequence="10"/>
+</odoo>

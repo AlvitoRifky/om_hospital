@@ -7,6 +7,10 @@
              <menuitem id="patient_menu_master" name="Patient Detail" parent="hospital_menu_root" sequence="1"/>
              <!-- This Menu Item Must have a parent -->
              <menuitem id="patient_menu" name="Patient" parent="patient_menu_master" sequence="1"/>
+             <menuitem id="appointment_menu_master" name="Janji temu" parent="hospital_menu_root" sequence="10"/>
+             <!-- This Menu Item Must have a parent -->
+             <menuitem id="menu_configuration" name="Konfigurasi" parent="hospital_menu_root" sequence="20"/>
+             <menuitem id="menu_cancel_appointment" name="Batal Janji temu" action="cancel_appointment_action" parent="appointment_menu_master" sequence="30"/>
             
         </data>
 </odoo>

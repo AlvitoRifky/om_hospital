@@ -17,14 +17,25 @@
     'version': '16.0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base'],
+    'depends': ['base','mail','product'],
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
+        'data/patient_tag_data.xml',
+        'data/sequence_data.xml',
+        'data/patient.tag.csv',
+        'wizard/cancel_appointment.xml',
         'views/views.xml',
         'views/templates.xml',
-        'views/menu_hospital.xml'
+        'views/menu.xml',
+        'views/patient_view.xml',
+        'views/female_patient_view.xml',
+        'views/appointment_view.xml',
+        'views/patient_tag.xml',
+        'views/res_config_settings_views.xml'
+
+        
     ],
     # only loaded in demonstration mode
     'demo': [

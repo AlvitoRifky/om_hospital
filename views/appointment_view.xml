@@ -1,0 +1,196 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+
+    <!-- model.name calendar view -->
+    <record id="hospital_appointment_view_calendar" model="ir.ui.view">
+        <field name="name">hospital.appointment.view.calendar</field>
+        <field name="model">hospital.appointment</field>
+        <field name="arch" type="xml">
+                <!-- Add your fields here -->
+
+            <calendar string="Janji temu" date_start="booking_date" mode="month" date_delay="duration" color="state" quick_add="False"
+                      hide_time="True" form_view_id="%(om_hospital.hospital_appointment_view_form)d" 
+                      event_open_popup="True" >
+                <field name="patient_id" filters="1" />
+                <field name="state" invisible="1" filters="1"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="hospital_appointment_view_activity" model="ir.ui.view">
+        <field name="name">hospital.appointment.view.activity</field>
+        <field name="model">hospital.appointment</field>
+        <field name="arch" type="xml">
+            <activity string="Appointment">
+                <field name="patient_id"/>
+                <field name="ref"/>
+                <templates>
+                    <div t-name="activity-box">
+                        <img t-att-src="activity_image ('hospital.patient', 'image', record.patient_id.raw_value)" 
+                             t-att-title="record.patient_id.value" t-att-alt="record.patient_id.value" />
+                        <div>
+                            <field name="ref" display="full"/>
+                        </div>
+                    </div>
+                </templates>
+            </activity>
+        </field>
+    </record>
+   
+    <!-- model.name tree view -->
+    <record id="hospital_appointment_view_tree" model="ir.ui.view">
+        <field name="name">hospital.appointment.view.tree</field>
+        <field name="model">hospital.appointment</field>
+        <field name="arch" type="xml">
+            <tree decoration-success="state == 'done'"  decoration-danger="state =='batal'"  
+                  decoration-info="state =='draft'"  decoration-warning="state =='konsultasi'" sample="1" multi_edit="1">
+                <header>
+                     <button name="action_konsultasi" string="Sedang konsultasi" type="object" class="oe_highlight"/>
+                </header>
+                <field name="name"/>
+                <field name="patient_id"/>
+                <field name="appointment_time"/>
+                <field name="ref" optional="show" />
+                <field name="doctor_id" widget="many2one_avatar_user"/>
+                <field name="gender"  optional="hide"/>
+                <field name="booking_date" optional="show"/>
+                <field name="activity_ids" widget= "list_activity"/>
+                <field name="state" 
+                        decoration-success="state == 'done'" 
+                        decoration-info="state =='draft'" 
+                        decoration-danger="state =='batal'"
+                        decoration-warning="state =='konsultasi'"
+                        widget="badge"/>
+                <button name="action_done" type="object"  class="fa fa-check btn-success"
+                        attrs="{'invisible': [('state', '!=', 'konsultasi')]}"/> 
+
+                <button name="%(om_hospital.cancel_appointment_action)d" type="action"  class="fa fa-times btn-danger"
+                        attrs="{'invisible': [('state', '!=', 'konsultasi')]}" 
+                        context="{'hide_appointment':1}"/>
+                <groupby name="patient_id">
+                        <field name="name"/>
+                        <button name="action_test" string="click me" type="object" class="oe_highlight"/>
+                        <button type="edit" name="edit" string="Edit" class="oe_highlight" readonly="1"/>
+                        <button name="action_done" type="object"  class="fa fa-check btn-success"/> 
+
+                </groupby> 
+            </tree>
+        </field>
+    </record>
+    <!-- model.name form view -->
+    <record id="hospital_appointment_view_form" model="ir.ui.view">
+        <field name="name">hospital.appointment.view.form</field>
+        <field name="model">hospital.appointment</field>
+        <field name="arch" type="xml">
+            <form string="">
+            <header>
+                <button name="action_konsultasi" string="Sedang konsultasi" type="object" states="draft" class="oe_highlight"
+                        data-hotkey="i"/>
+                <button name="action_done" string="Selesai" type="object" states="konsultasi" class="oe_highlight"
+                        data-hotkey="v"/>
+                <button name="%(om_hospital.cancel_appointment_action)d" string="Batal" type="action" states="draft,konsultasi" 
+                        data-hotkey="z"
+                        context="{'hide_appointment':1}" />
+                <!-- <button name="action_batal" string="Batal" type="object" states="draft,konsultasi" 
+                        context="{'hide_appointment':1}"
+                        data-hotkey="z"/> -->
+                <button name="action_draft" string="Reset" type="object" states="batal" class="oe_highlight" 
+                        data-hotkey="l"/>
+                <field name="state" widget="statusbar" nolabel="1" statusbar_visible="draft,konsultasi,done"/>
+                <!-- options="{'clickable': '1'}"  -->
+            </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="patient_id"/>
+                            <field name="gender"/>
+                            <field name="ref"/>
+                            <field name="doctor_id" widget="many2one_avatar"/>
+                            <field name="booking_date" default_focus= "1"/>
+                            <field name="duration"/>
+                        
+                        </group>
+                        <group>
+                            <field name="hide_sales_price"/>
+                            <field name="appointment_time"/>
+                       <button name= "action_test" string="object button" confirm="apakah anda yakin ingin menjalankan kode python ?"
+                               type="object" class="oe_highlight"
+                               help= "pesan akan di print"
+                               groups= "base.group_no_one"
+                               />
+                       <button name= "%(om_hospital.action_hospital_patient)d" string="action button" confirm="apakah anda yakin membuka menu pasien ?"
+                               type="action" class="oe_highlight"
+                               help="Jika kamu mengklik ini akan berpindah ke menu pasien"
+                               />
+                        </group>
+                       <notebook>
+                        <page string="Resep" name= "prescription" >
+                            <field name="prescription" options="{'collaborative': true, 'resizable':true, 'codeview':true}"/>
+                        </page>
+                        <page string="Farmasi" name= "pharmacy">
+                            <field name="pharmacy_line_ids">
+                                <tree editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="price_unit" attrs="{'column_invisible': [('parent.hide_sales_price', '=', True)]}"/>
+                                    <field name="qty"/>
+                                </tree>
+                                <form>
+                                    <group>
+                                        <field name="product_id"/>
+                                        <field name="price_unit" attrs="{'column_invisible': [('parent.hide_sales_price', '=', True)]}"/>
+                                        <field name="qty"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                       </notebook>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- model.name search view -->
+    <record id="hospital_appointment_view_search" model="ir.ui.view">
+        <field name="name">hospital.appointment.view.search</field>
+        <field name="model">hospital.appointment</field>
+        <field name="arch" type="xml">
+            <search>
+                <!-- Add your fields here -->
+              
+               
+                <group expand="0" string="Group By">
+                    
+                </group>
+                <searchpanel>
+                   
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+    <!-- model.name action window -->
+    <record id="action_hospital_appointment" model="ir.actions.act_window">
+        <field name="name">Appointment</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hospital.appointment</field>
+        <field name="view_mode">tree,form,search,activity,calendar</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                <!-- Add Text Here -->
+            </p><p>
+                <!-- More details about what a user can do with this object will be OK --> 
+            
+            </p>
+        </field>
+    </record>
+
+    <!-- This Menu Item must have a parent and an action -->
+    <menuitem id="appointment_menu" name="Janji temu" parent="appointment_menu_master" action="action_hospital_appointment" sequence="10"/>
+</odoo>

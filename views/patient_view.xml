@@ -1,0 +1,109 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    
+    <!-- model.name tree view -->
+    <record id="hospital_patient_view_tree" model="ir.ui.view">
+        <field name="name">hospital.patient.view.tree</field>
+        <field name="model">hospital.patient</field>
+        <field name="arch" type="xml">
+            <tree export_xlsx="0">
+                <field name="name"/>
+                <field name="ref"/>
+                <field name="age"/>
+                <field name="gender"/>
+                
+            </tree>
+        </field>
+    </record>
+    <!-- model.name form view -->
+    <record id="hospital_patient_view_form" model="ir.ui.view">
+        <field name="name">hospital.patient.view.form</field>
+        <field name="model">hospital.patient</field>
+        <field name="arch" type="xml">
+            <form string="">
+                <sheet>
+                        <field name="image" widget="image" class="oe_avatar"/>
+                        <div class="oe_title">
+                            <h4>
+                                <field name="ref" readonly="1"/>                               
+                            </h4>
+                            <h2>
+                                <label for="name" string="Nama" class="oe_edit_only"/>
+                                <field name="name"/>
+                            </h2>
+                        </div>
+                    <group>
+                        <group>
+                        <field name="date_of_birth"/>
+                        <field name="age"/>
+                        <field name="appointment_count"/>
+                        </group>
+                        <group>
+                        <field name="gender" widget="radio"/>
+                        <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                        <field name="active" invisible="1"/>
+
+                        </group>
+                    </group>
+                    <group name="other_info" string="Info lainya">
+                        <field name="parent" attrs="{'invisible':[('age', '>', 18)]}"/>
+                        <field name="marital_status" attrs="{'invisible':[('age', '&lt;', 18)]}" />
+                        <field name="partner_name" attrs="{'readonly': [('marital_status', '!=', 'menikah')], 'required': [('marital_status', '=', 'menikah')]}"/>
+                        
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- model.name search view -->
+    <record id="hospital_patient_view_search" model="ir.ui.view">
+        <field name="name">hospital.patient.view.search</field>
+        <field name="model">hospital.patient</field>
+        <field name="arch" type="xml">
+            <search>
+                <!-- Add your fields here -->
+                <field name="name" filter_domain="['|', ('name', 'ilike', self), ('ref', 'ilike', self)]"/>
+                <field name="ref"/>
+                <field name="age"/>
+                <field name="gender"/>
+                <filter name="filter_laki" string="Laki-laki" domain="[('gender', '=', 'laki-laki')]" />
+                <filter name="filter_perempuan" string="Perempuan" domain="[('gender', '=', 'perempuan')]" />
+                <!-- <separator/>
+                <filter name="filter_anak" string="Anak-anak" domain="[('age', '&lt;=', '5')]" /> -->
+                 <filter name="filter_archived" string="Archived" domain="[('active', '=', False)]" />
+                <group expand="0" string="Group By">
+                    <filter name="group_by_gender" string="Gender" context="{'group_by': 'gender'}" />
+                </group>
+                <searchpanel>
+                    <field name="gender" string="Gender" icon="fa-users" select="multi" enable_counters="1"/>
+                </searchpanel>
+            </search>
+        </field>
+    </record>
+    <!-- model.name action window -->
+    <record id="action_hospital_patient" model="ir.actions.act_window">
+        <field name="name">Patients</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hospital.patient</field>
+        <field name="view_mode">tree,form,search</field>
+        <field name="context">{'search_default_filter_laki': 1, 'search_default_group_by_gender': 1}</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                <!-- Add Text Here -->
+            </p><p>
+                <!-- More details about what a user can do with this object will be OK --> 
+            
+            </p>
+        </field>
+    </record>
+
+    <!-- This Menu Item must have a parent and an action -->
+    <menuitem id="patient_menu" name="Pasien" parent="patient_menu_master" action="action_hospital_patient" sequence="1"/>
+</odoo>
